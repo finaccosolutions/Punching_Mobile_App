@@ -55,7 +55,7 @@ export default function LoginScreen() {
     }
   };
   
-  // Demo login helpers
+  // Demo login helpers with correct credentials that match Supabase
   const loginAsAdmin = () => {
     setEmail('admin@punchpro.com');
     setPassword('admin123');
@@ -129,13 +129,13 @@ export default function LoginScreen() {
                 style={[styles.demoButton, { backgroundColor: colors.primaryLight }]}
                 onPress={loginAsAdmin}
               >
-                <Text style={[styles.demoButtonText, { color: colors.primary }]}>Admin Login</Text>
+                <Text style={[styles.demoButtonText, { color: colors.primary }]}>Admin</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.demoButton, { backgroundColor: colors.primaryLight }]}
                 onPress={loginAsEmployee}
               >
-                <Text style={[styles.demoButtonText, { color: colors.primary }]}>Employee Login</Text>
+                <Text style={[styles.demoButtonText, { color: colors.primary }]}>Employee</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -8,6 +8,7 @@ import { SplashScreen } from 'expo-router';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 
+// Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -21,14 +22,12 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    const hideSplash = async () => {
-      if (fontsLoaded || fontError) {
-        await SplashScreen.hideAsync();
-      }
-    };
-    hideSplash();
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync();
+    }
   }, [fontsLoaded, fontError]);
 
+  // Return null to keep splash screen visible while fonts load
   if (!fontsLoaded && !fontError) {
     return null;
   }
@@ -36,7 +35,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Stack>
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(app)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" options={{ title: 'Not Found' }} />
