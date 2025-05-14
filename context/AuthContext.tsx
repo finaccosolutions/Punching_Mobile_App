@@ -2,9 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter, useSegments } from 'expo-router';
 import { Platform } from 'react-native';
-
-// Mock API for demonstration purposes
-import { loginApi, registerApi } from '@/services/authService';
+import { loginApi, updateProfile as updateProfileApi, changePassword as changePasswordApi } from '@/services/authService';
 
 // User types
 export type UserRole = 'admin' | 'employee';
@@ -24,8 +22,9 @@ interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (updates: { name?: string; avatar?: string }) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -33,8 +32,9 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: false,
   error: null,
   login: async () => {},
-  register: async () => {},
   logout: async () => {},
+  updateProfile: async () => {},
+  changePassword: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -98,36 +98,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const inAuthGroup = segments[0] === '(auth)';
 
-    // If user is not authenticated and not in auth group, redirect to login
     if (!user && !inAuthGroup) {
       router.replace('/(auth)/login');
-    } 
-    // If user is authenticated and in auth group, redirect to app
-    else if (user && inAuthGroup) {
+    } else if (user && inAuthGroup) {
       router.replace('/(app)/(tabs)');
     }
   }, [user, segments, isLoading]);
 
-  // Authentication functions
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     setError(null);
     try {
       const userData = await loginApi(email, password);
-      await storage.setItem(USER_KEY, JSON.stringify(userData));
-      setUser(userData);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const register = async (name: string, email: string, password: string, role: UserRole) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const userData = await registerApi(name, email, password, role);
       await storage.setItem(USER_KEY, JSON.stringify(userData));
       setUser(userData);
     } catch (e) {
@@ -149,8 +131,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateProfile = async (updates: { name?: string; avatar?: string }) => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    setError(null);
+    try {
+      await updateProfileApi(user.id, updates);
+      const updatedUser = { ...user, ...updates };
+      await storage.setItem(USER_KEY, JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (e) {
+      setError((e as Error).message);
+      throw e;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await changePasswordApi(currentPassword, newPassword);
+    } catch (e) {
+      setError((e as Error).message);
+      throw e;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, error, login, register, logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isLoading, 
+        error, 
+        login, 
+        logout,
+        updateProfile,
+        changePassword,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

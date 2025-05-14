@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
@@ -139,14 +139,6 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </View>
           </View>
-          
-          <Link href="/(auth)/register" asChild>
-            <TouchableOpacity style={styles.registerLink}>
-              <Text style={[styles.registerLinkText, { color: colors.textSecondary }]}>
-                Don't have an account? <Text style={{ color: colors.primary }}>Sign Up</Text>
-              </Text>
-            </TouchableOpacity>
-          </Link>
         </Card>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -205,7 +197,6 @@ const styles = StyleSheet.create({
   },
   demoSection: {
     marginTop: 24,
-    marginBottom: 16,
   },
   demoText: {
     fontFamily: 'Inter-Medium',
@@ -225,14 +216,6 @@ const styles = StyleSheet.create({
   },
   demoButtonText: {
     fontFamily: 'Inter-Medium',
-    fontSize: 14,
-  },
-  registerLink: {
-    marginTop: 8,
-    alignItems: 'center',
-  },
-  registerLinkText: {
-    fontFamily: 'Inter-Regular',
     fontSize: 14,
   },
 });
