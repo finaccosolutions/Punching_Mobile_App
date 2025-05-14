@@ -26,49 +26,62 @@ export default function TabLayout() {
         headerShown: false,
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Attendance',
-          tabBarIcon: ({ color, size }) => <Clock size={size} color={color} />,
-        }}
-      />
-      
-      {isAdmin && (
-        <Tabs.Screen
-          name="employees"
-          options={{
-            title: 'Employees',
-            tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
-          }}
-        />
+      {isAdmin ? (
+        <>
+          <Tabs.Screen
+            name="employees"
+            options={{
+              title: 'Employees',
+              tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="reports"
+            options={{
+              title: 'Reports',
+              tabBarIcon: ({ color, size }) => <ClipboardList size={size} color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="payroll"
+            options={{
+              title: 'Payroll',
+              tabBarIcon: ({ color, size }) => <DollarSign size={size} color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="settings"
+            options={{
+              title: 'Settings',
+              tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <Tabs.Screen
+            name="index"
+            options={{
+              title: 'Attendance',
+              tabBarIcon: ({ color, size }) => <Clock size={size} color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="reports"
+            options={{
+              title: 'Reports',
+              tabBarIcon: ({ color, size }) => <ClipboardList size={size} color={color} />,
+            }}
+          />
+          <Tabs.Screen
+            name="settings"
+            options={{
+              title: 'Settings',
+              tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
+            }}
+          />
+        </>
       )}
-      
-      <Tabs.Screen
-        name="reports"
-        options={{
-          title: 'Reports',
-          tabBarIcon: ({ color, size }) => <ClipboardList size={size} color={color} />,
-        }}
-      />
-      
-      {isAdmin && (
-        <Tabs.Screen
-          name="payroll"
-          options={{
-            title: 'Payroll',
-            tabBarIcon: ({ color, size }) => <DollarSign size={size} color={color} />,
-          }}
-        />
-      )}
-      
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
-        }}
-      />
     </Tabs>
   );
 }

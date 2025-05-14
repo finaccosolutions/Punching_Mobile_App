@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Alert, ScrollView, Image, Linking, Platform } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { redirect } from 'expo-router';
 import { MapPin, Clock, Calendar, CircleCheck as CheckCircle, Circle as XCircle, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import { format } from 'date-fns';
@@ -12,11 +11,19 @@ import { getCurrentLocation, isWithinAnyOffice, checkLocationServices, isLocatio
 import AttendanceStatus from '@/components/attendance/AttendanceStatus';
 import AttendanceMap from '@/components/attendance/AttendanceMap';
 import RecentActivity from '@/components/attendance/RecentActivity';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
-export default function AttendanceScreen() {
-  const { colors } = useTheme();
+export default function IndexScreen() {
   const { user } = useAuth();
+  const { colors } = useTheme();
   
+  // Redirect admin users to employees screen
+  if (user?.role === 'admin') {
+    redirect('/employees');
+    return null;
+  }
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
