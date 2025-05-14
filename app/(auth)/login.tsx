@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '@/context/ThemeContext';
@@ -55,15 +55,15 @@ export default function LoginScreen() {
     }
   };
   
-  // Demo login helpers
+  // Demo login helpers with correct credentials that match Supabase
   const loginAsAdmin = () => {
-    setEmail('admin@example.com');
-    setPassword('password');
+    setEmail('admin@punchpro.com');
+    setPassword('admin123');
   };
   
   const loginAsEmployee = () => {
-    setEmail('employee@example.com');
-    setPassword('password');
+    setEmail('employee@punchpro.com');
+    setPassword('employee123');
   };
   
   return (

@@ -105,15 +105,19 @@ export default function Button({
       disabled={disabled || loading}
       activeOpacity={0.8}
     >
-      {loading ? (
-        <ActivityIndicator color={currentVariant.textColor} size="small" />
-      ) : (
-        <View style={styles.content}>
-          {leftIcon && <View style={styles.icon}>{leftIcon}</View>}
-          <Text style={textStyles}>{title}</Text>
-          {rightIcon && <View style={styles.icon}>{rightIcon}</View>}
-        </View>
-      )}
+      <View style={styles.content}>
+        {loading ? (
+          <ActivityIndicator color={currentVariant.textColor} size="small" />
+        ) : (
+          <>
+            {leftIcon && <View style={styles.icon}>{leftIcon}</View>}
+            <View style={styles.textContainer}>
+              <Text style={textStyles}>{title}</Text>
+            </View>
+            {rightIcon && <View style={styles.icon}>{rightIcon}</View>}
+          </>
+        )}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -131,9 +135,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  textContainer: {
+    marginHorizontal: 8,
+  },
   text: {
     textAlign: 'center',
-    marginHorizontal: 8,
   },
   icon: {
     justifyContent: 'center',
