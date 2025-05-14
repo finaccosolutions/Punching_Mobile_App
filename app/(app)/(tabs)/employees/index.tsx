@@ -14,18 +14,18 @@ export default function EmployeesScreen() {
   const router = useRouter();
   const { user } = useAuth();
   
-  // Redirect non-admin users
-  if (user?.role !== 'admin') {
-    router.replace('/');
-    return null;
-  }
-  
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
+    // Check user role and redirect if needed
+    if (user?.role !== 'admin') {
+      router.replace('/');
+      return;
+    }
+
     const fetchEmployees = async () => {
       try {
         setIsLoading(true);
@@ -40,7 +40,16 @@ export default function EmployeesScreen() {
     };
     
     fetchEmployees();
-  }, []);
+  }, [user, router]);
+  
+  useEffect(() => {
+    const filtered = employees.filter(emp => 
+      emp.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.position?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredEmployees(filtered);
+  }, [searchQuery, employees]);
   
   const handleAddEmployee = () => {
     router.push('/employees/add');

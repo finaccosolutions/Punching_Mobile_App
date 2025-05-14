@@ -8,8 +8,6 @@ export default function TabLayout() {
   const { colors } = useTheme();
   const { user } = useAuth();
   
-  const isAdmin = user?.role === 'admin';
-  
   return (
     <Tabs
       screenOptions={{
@@ -26,7 +24,7 @@ export default function TabLayout() {
         headerShown: false,
       }}
     >
-      {isAdmin ? (
+      {user?.role === 'admin' ? (
         <>
           <Tabs.Screen
             name="employees"
