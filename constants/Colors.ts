@@ -1,0 +1,103 @@
+const tintColorLight = '#2563EB';
+const tintColorDark = '#3B82F6';
+
+export default {
+  light: {
+    text: '#1F2937',
+    textSecondary: '#6B7280',
+    background: '#F9FAFB',
+    tint: tintColorLight,
+    tabIconDefault: '#9CA3AF',
+    tabIconSelected: tintColorLight,
+    inputBackground: '#FFFFFF',
+    cardBackground: '#FFFFFF',
+    cardBackgroundAlt: '#F3F4F6',
+    border: '#E5E7EB',
+    notification: '#FF3B30',
+    shadowColor: '#000000',
+    disabledBackground: '#F3F4F6',
+
+    // Base colors
+    primary: '#2563EB',
+    primaryLight: '#DBEAFE',
+    primaryDark: '#1E40AF',
+    secondary: '#0891B2',
+    secondaryLight: '#CFFAFE',
+    secondaryDark: '#0E7490',
+    accent: '#F97316',
+    accentLight: '#FFEDD5',
+    accentDark: '#C2410C',
+
+    // State colors
+    success: '#16A34A',
+    successLight: '#DCFCE7',
+    warning: '#FBBF24',
+    warningLight: '#FEF3C7',
+    error: '#DC2626',
+    errorLight: '#FEE2E2',
+    info: '#2563EB',
+    infoLight: '#DBEAFE',
+
+    // Base colors
+    white: '#FFFFFF',
+    black: '#000000',
+    gray100: '#F3F4F6',
+    gray200: '#E5E7EB',
+    gray300: '#D1D5DB',
+    gray400: '#9CA3AF',
+    gray500: '#6B7280',
+    gray600: '#4B5563',
+    gray700: '#374151',
+    gray800: '#1F2937',
+    gray900: '#111827',
+  },
+  dark: {
+    text: '#F9FAFB',
+    textSecondary: '#9CA3AF',
+    background: '#111827',
+    tint: tintColorDark,
+    tabIconDefault: '#6B7280',
+    tabIconSelected: tintColorDark,
+    inputBackground: '#1F2937',
+    cardBackground: '#1F2937',
+    cardBackgroundAlt: '#374151',
+    border: '#374151',
+    notification: '#FF453A',
+    shadowColor: '#000000',
+    disabledBackground: '#374151',
+
+    // Base colors
+    primary: '#3B82F6',
+    primaryLight: '#1E40AF',
+    primaryDark: '#DBEAFE',
+    secondary: '#06B6D4',
+    secondaryLight: '#0E7490',
+    secondaryDark: '#CFFAFE',
+    accent: '#F97316',
+    accentLight: '#C2410C',
+    accentDark: '#FFEDD5',
+
+    // State colors
+    success: '#22C55E',
+    successLight: '#166534',
+    warning: '#FBBF24',
+    warningLight: '#854D0E',
+    error: '#EF4444',
+    errorLight: '#991B1B',
+    info: '#3B82F6',
+    infoLight: '#1E40AF',
+
+    // Base colors
+    white: '#FFFFFF',
+    black: '#000000',
+    gray100: '#1F2937',
+    gray200: '#374151',
+    gray300: '#4B5563',
+    gray400: '#6B7280',
+    gray500: '#9CA3AF',
+    gray600: '#D1D5DB',
+    gray700: '#E5E7EB',
+    gray800: '#F3F4F6',
+    gray900: '#F9FAFB',
+  },
+};
