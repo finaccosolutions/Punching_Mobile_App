@@ -4,27 +4,38 @@ import { useTheme } from '@/context/ThemeContext';
 import { MapPin } from 'lucide-react-native';
 import * as Location from 'expo-location';
 
-// Only define types and imports when not on web
-let MapView: any = () => null;
-let Marker: any = () => null;
-let Circle: any = () => null;
+// Define types for map components
+type MapViewType = typeof import('react-native-maps').default;
+type MarkerType = typeof import('react-native-maps').Marker;
+type CircleType = typeof import('react-native-maps').Circle;
 
-// Dynamically import map components only on native platforms
+// Initialize map components as null for web
+let MapView: MapViewType | null = null;
+let Marker: MarkerType | null = null;
+let Circle: CircleType | null = null;
+
+// Only import map components on native platforms
 if (Platform.OS !== 'web') {
   try {
-    const MapComponent = require('react-native-maps');
-    MapView = MapComponent.default;
-    Marker = MapComponent.Marker;
-    Circle = MapComponent.Circle;
-  } catch (e) {
-    console.warn('Failed to load react-native-maps:', e);
+    const { default: RNMapView, Marker: RNMarker, Circle: RNCircle } = require('react-native-maps');
+    MapView = RNMapView;
+    Marker = RNMarker;
+    Circle = RNCircle;
+  } catch (error) {
+    console.warn('react-native-maps not available', error);
   }
 }
 
 interface AttendanceMapProps {
   currentLocation: Location.LocationObject | null;
   isWithinOffice: boolean;
-  officeInfo: any;
+  officeInfo?: {
+    latitude: number;
+    longitude: number;
+    radius: number;
+    name: string;
+    address: string;
+  } | null;
 }
 
 export default function AttendanceMap({
@@ -35,20 +46,22 @@ export default function AttendanceMap({
   const { colors, isDark } = useTheme();
   
   // Show placeholder on web or when location/map is not available
-  if (Platform.OS === 'web' || !currentLocation || !MapView) {
+  const showPlaceholder = Platform.OS === 'web' || !currentLocation || !MapView;
+  
+  if (showPlaceholder) {
     return (
       <View style={[styles.mapPlaceholder, { backgroundColor: colors.cardBackgroundAlt }]}>
         <MapPin size={24} color={colors.textSecondary} />
         <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>
           {!currentLocation 
             ? 'Waiting for location data...' 
-            : 'Map view not available on web'
+            : 'Map view not available on this platform'
           }
         </Text>
       </View>
     );
   }
-  
+
   // Custom map style for dark mode
   const mapStyle = isDark ? [
     {
@@ -89,71 +102,77 @@ export default function AttendanceMap({
       "stylers": [{ "color": "#17263c" }]
     }
   ] : [];
-  
+
   return (
-    <MapView
-      style={styles.map}
-      customMapStyle={mapStyle}
-      initialRegion={{
-        latitude: currentLocation.coords.latitude,
-        longitude: currentLocation.coords.longitude,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      }}
-    >
-      {/* User's current location */}
-      <Marker
-        coordinate={{
+    <View style={styles.container}>
+      <MapView
+        style={styles.map}
+        customMapStyle={mapStyle}
+        initialRegion={{
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
         }}
-        title="Your Location"
-        pinColor={isWithinOffice ? "green" : "red"}
-      />
-      
-      {/* Accuracy circle around user's location */}
-      <Circle
-        center={{
-          latitude: currentLocation.coords.latitude,
-          longitude: currentLocation.coords.longitude,
-        }}
-        radius={currentLocation.coords.accuracy || 50}
-        fillColor="rgba(77, 123, 245, 0.2)"
-        strokeColor="rgba(77, 123, 245, 0.5)"
-      />
-      
-      {/* Office location if available */}
-      {officeInfo && (
-        <>
-          <Marker
-            coordinate={{
-              latitude: officeInfo.latitude,
-              longitude: officeInfo.longitude,
-            }}
-            title={officeInfo.name}
-            description={officeInfo.address}
-            pinColor="blue"
-          />
-          
-          <Circle
-            center={{
-              latitude: officeInfo.latitude,
-              longitude: officeInfo.longitude,
-            }}
-            radius={officeInfo.radius}
-            fillColor="rgba(0, 100, 0, 0.1)"
-            strokeColor="rgba(0, 100, 0, 0.3)"
-          />
-        </>
-      )}
-    </MapView>
+      >
+        {/* User's current location */}
+        <Marker
+          coordinate={{
+            latitude: currentLocation.coords.latitude,
+            longitude: currentLocation.coords.longitude,
+          }}
+          title="Your Location"
+          pinColor={isWithinOffice ? "green" : "red"}
+        />
+        
+        {/* Accuracy circle around user's location */}
+        <Circle
+          center={{
+            latitude: currentLocation.coords.latitude,
+            longitude: currentLocation.coords.longitude,
+          }}
+          radius={currentLocation.coords.accuracy || 50}
+          fillColor="rgba(77, 123, 245, 0.2)"
+          strokeColor="rgba(77, 123, 245, 0.5)"
+        />
+        
+        {/* Office location if available */}
+        {officeInfo && (
+          <>
+            <Marker
+              coordinate={{
+                latitude: officeInfo.latitude,
+                longitude: officeInfo.longitude,
+              }}
+              title={officeInfo.name}
+              description={officeInfo.address}
+              pinColor="blue"
+            />
+            
+            <Circle
+              center={{
+                latitude: officeInfo.latitude,
+                longitude: officeInfo.longitude,
+              }}
+              radius={officeInfo.radius}
+              fillColor="rgba(0, 100, 0, 0.1)"
+              strokeColor="rgba(0, 100, 0, 0.3)"
+            />
+          </>
+        )}
+      </MapView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  map: {
+  container: {
     width: '100%',
     height: 200,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
     borderRadius: 8,
   },
   mapPlaceholder: {
