@@ -4,26 +4,20 @@ import { useTheme } from '@/context/ThemeContext';
 import { MapPin } from 'lucide-react-native';
 import * as Location from 'expo-location';
 
-// Only define types when not on web
-type MapViewType = any;
-type MarkerType = any;
-type CircleType = any;
+// Only define types and imports when not on web
+let MapView: any = () => null;
+let Marker: any = () => null;
+let Circle: any = () => null;
 
-// Initialize map components as null components
-let MapView: MapViewType = () => null;
-let Marker: MarkerType = () => null;
-let Circle: CircleType = () => null;
-
-// Dynamic import for native platforms only
+// Dynamically import map components only on native platforms
 if (Platform.OS !== 'web') {
-  // Using require instead of import to prevent bundling on web
   try {
     const MapComponent = require('react-native-maps');
     MapView = MapComponent.default;
     Marker = MapComponent.Marker;
     Circle = MapComponent.Circle;
   } catch (e) {
-    console.warn('react-native-maps failed to load:', e);
+    console.warn('Failed to load react-native-maps:', e);
   }
 }
 
@@ -40,7 +34,7 @@ export default function AttendanceMap({
 }: AttendanceMapProps) {
   const { colors, isDark } = useTheme();
   
-  // If on web platform or no location, show placeholder
+  // Show placeholder on web or when location/map is not available
   if (Platform.OS === 'web' || !currentLocation || !MapView) {
     return (
       <View style={[styles.mapPlaceholder, { backgroundColor: colors.cardBackgroundAlt }]}>
