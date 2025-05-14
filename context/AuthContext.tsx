@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter, useSegments } from 'expo-router';
+import { Platform } from 'react-native';
 
 // Mock API for demonstration purposes
 import { loginApi, registerApi } from '@/services/authService';
@@ -41,6 +42,30 @@ export const useAuth = () => useContext(AuthContext);
 // Constants
 const USER_KEY = 'punchpro_user';
 
+// Platform-specific storage implementation
+const storage = {
+  getItem: async (key: string): Promise<string | null> => {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(key);
+    }
+    return SecureStore.getItemAsync(key);
+  },
+  setItem: async (key: string, value: string): Promise<void> => {
+    if (Platform.OS === 'web') {
+      localStorage.setItem(key, value);
+    } else {
+      await SecureStore.setItemAsync(key, value);
+    }
+  },
+  removeItem: async (key: string): Promise<void> => {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(key);
+    } else {
+      await SecureStore.deleteItemAsync(key);
+    }
+  },
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -48,11 +73,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const router = useRouter();
   const segments = useSegments();
 
-  // Load user from secure storage on app start
+  // Load user from storage on app start
   useEffect(() => {
     async function loadUser() {
       try {
-        const userJSON = await SecureStore.getItemAsync(USER_KEY);
+        const userJSON = await storage.getItem(USER_KEY);
         if (userJSON) {
           const userData = JSON.parse(userJSON);
           setUser(userData);
@@ -89,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     try {
       const userData = await loginApi(email, password);
-      await SecureStore.setItemAsync(USER_KEY, JSON.stringify(userData));
+      await storage.setItem(USER_KEY, JSON.stringify(userData));
       setUser(userData);
     } catch (e) {
       setError((e as Error).message);
@@ -103,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     try {
       const userData = await registerApi(name, email, password, role);
-      await SecureStore.setItemAsync(USER_KEY, JSON.stringify(userData));
+      await storage.setItem(USER_KEY, JSON.stringify(userData));
       setUser(userData);
     } catch (e) {
       setError((e as Error).message);
@@ -115,7 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setIsLoading(true);
     try {
-      await SecureStore.deleteItemAsync(USER_KEY);
+      await storage.removeItem(USER_KEY);
       setUser(null);
     } catch (e) {
       console.error('Error during logout', e);

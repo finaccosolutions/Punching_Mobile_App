@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, ActivityIndicator, ViewStyle, TextStyle, View } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 
 interface ButtonProps {
@@ -108,11 +108,11 @@ export default function Button({
       {loading ? (
         <ActivityIndicator color={currentVariant.textColor} size="small" />
       ) : (
-        <>
-          {leftIcon && <>{leftIcon}</>}
+        <View style={styles.content}>
+          {leftIcon && <View style={styles.icon}>{leftIcon}</View>}
           <Text style={textStyles}>{title}</Text>
-          {rightIcon && <>{rightIcon}</>}
-        </>
+          {rightIcon && <View style={styles.icon}>{rightIcon}</View>}
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -125,9 +125,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 8,
     borderWidth: 1,
-    gap: 8,
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
     textAlign: 'center',
+    marginHorizontal: 8,
+  },
+  icon: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
