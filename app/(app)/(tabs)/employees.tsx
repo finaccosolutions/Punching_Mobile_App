@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
 import Card from '@/components/ui/Card';
 import { 
   Users, 
@@ -19,6 +21,8 @@ import Button from '@/components/ui/Button';
 
 export default function EmployeesScreen() {
   const { colors } = useTheme();
+  const router = useRouter();
+  const { user } = useAuth();
   
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
@@ -26,6 +30,11 @@ export default function EmployeesScreen() {
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
+    if (user?.role !== 'admin') {
+      router.replace('/');
+      return;
+    }
+
     const fetchEmployees = async () => {
       try {
         setIsLoading(true);
@@ -40,18 +49,22 @@ export default function EmployeesScreen() {
     };
     
     fetchEmployees();
-  }, []);
+  }, [user, router]);
   
   useEffect(() => {
     const filtered = employees.filter(emp => 
-      emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.department.toLowerCase().includes(searchQuery.toLowerCase())
+      emp.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.department?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     
     setFilteredEmployees(filtered);
   }, [searchQuery, employees]);
   
+  const handleAddEmployee = () => {
+    router.push('/employees/add');
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -60,10 +73,10 @@ export default function EmployeesScreen() {
       >
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text }]}>
-            Employees
+            {user?.role === 'admin' ? 'Manage Employees' : 'Employees'}
           </Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Manage your team members
+            {user?.role === 'admin' ? 'Add and manage employee accounts' : 'View your team members'}
           </Text>
         </View>
         
@@ -87,49 +100,53 @@ export default function EmployeesScreen() {
           </View>
         </Card>
         
-        {/* Employee Stats */}
-        <Card style={styles.statsCard}>
-          <View style={styles.statsGrid}>
-            <View style={styles.statsItem}>
-              <Text style={[styles.statsValue, { color: colors.text }]}>
-                {employees.length}
-              </Text>
-              <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>
-                Total
-              </Text>
+        {/* Employee Stats - Only show if not admin */}
+        {user?.role !== 'admin' && (
+          <Card style={styles.statsCard}>
+            <View style={styles.statsGrid}>
+              <View style={styles.statsItem}>
+                <Text style={[styles.statsValue, { color: colors.text }]}>
+                  {employees.length}
+                </Text>
+                <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>
+                  Total
+                </Text>
+              </View>
+              
+              <View style={[styles.statsDivider, { backgroundColor: colors.border }]} />
+              
+              <View style={styles.statsItem}>
+                <Text style={[styles.statsValue, { color: colors.text }]}>
+                  {employees.filter(e => e.department === 'Engineering').length}
+                </Text>
+                <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>
+                  Engineering
+                </Text>
+              </View>
+              
+              <View style={[styles.statsDivider, { backgroundColor: colors.border }]} />
+              
+              <View style={styles.statsItem}>
+                <Text style={[styles.statsValue, { color: colors.text }]}>
+                  {employees.filter(e => e.department === 'Marketing').length}
+                </Text>
+                <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>
+                  Marketing
+                </Text>
+              </View>
             </View>
-            
-            <View style={[styles.statsDivider, { backgroundColor: colors.border }]} />
-            
-            <View style={styles.statsItem}>
-              <Text style={[styles.statsValue, { color: colors.text }]}>
-                {employees.filter(e => e.department === 'Engineering').length}
-              </Text>
-              <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>
-                Engineering
-              </Text>
-            </View>
-            
-            <View style={[styles.statsDivider, { backgroundColor: colors.border }]} />
-            
-            <View style={styles.statsItem}>
-              <Text style={[styles.statsValue, { color: colors.text }]}>
-                {employees.filter(e => e.department === 'Marketing').length}
-              </Text>
-              <Text style={[styles.statsLabel, { color: colors.textSecondary }]}>
-                Marketing
-              </Text>
-            </View>
-          </View>
-        </Card>
+          </Card>
+        )}
         
-        {/* Add Employee Button */}
-        <Button
-          title="Add New Employee"
-          onPress={() => {}}
-          leftIcon={<Plus size={18} color={colors.white} />}
-          style={styles.addButton}
-        />
+        {/* Add Employee Button - Only show if admin */}
+        {user?.role === 'admin' && (
+          <Button
+            title="Add New Employee"
+            onPress={handleAddEmployee}
+            leftIcon={<Plus size={18} color={colors.white} />}
+            style={styles.addButton}
+          />
+        )}
         
         {/* Employees List */}
         <View style={styles.employeesList}>
@@ -146,12 +163,16 @@ export default function EmployeesScreen() {
           ) : filteredEmployees.length === 0 ? (
             <Card style={styles.emptyCard}>
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-                No employees found matching "{searchQuery}"
+                {searchQuery ? `No employees found matching "${searchQuery}"` : 'No employees found'}
               </Text>
             </Card>
           ) : (
             filteredEmployees.map((employee) => (
-              <EmployeeListItem key={employee.id} employee={employee} />
+              <EmployeeListItem 
+                key={employee.id} 
+                employee={employee}
+                onPress={() => router.push(`/employees/${employee.id}`)}
+              />
             ))
           )}
         </View>

@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-nati
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import Card from '@/components/ui/Card';
-import { ClipboardList, Calendar, ArrowRight, Filter } from 'lucide-react-native';
+import { ClipboardList, Calendar, ArrowRight, Filter, Clock, Circle as XCircle } from 'lucide-react-native';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { getAttendanceSummary, AttendanceSummary } from '@/services/attendanceService';
 import AttendanceChart from '@/components/reports/AttendanceChart';

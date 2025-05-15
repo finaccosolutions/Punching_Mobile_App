@@ -16,6 +16,30 @@ interface CreateEmployeeData {
   address?: string;
 }
 
+export interface Employee {
+  id: string;
+  name: string;
+  email: string;
+  department?: string;
+  position?: string;
+  avatar_url?: string;
+  phone_number?: string;
+}
+
+// Get all employees
+export const getAllEmployees = async (): Promise<Employee[]> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name as name, email, department, position, avatar_url, phone_number')
+    .eq('role', 'employee');
+
+  if (error) {
+    throw new Error('Failed to fetch employees');
+  }
+
+  return data || [];
+};
+
 // Create new employee (admin only)
 export const createEmployee = async (employeeData: CreateEmployeeData) => {
   // Generate a temporary password

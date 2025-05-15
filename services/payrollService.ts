@@ -1,6 +1,6 @@
 import { format, subMonths, getDaysInMonth, parseISO } from 'date-fns';
 import { Employee } from './employeeService';
-import { getAttendanceSummary, AttendanceSummary } from './attendanceService';
+import { getAttendanceSummary } from './attendanceService';
 
 export interface PayrollItem {
   id: string;
