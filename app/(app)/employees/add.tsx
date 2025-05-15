@@ -13,11 +13,14 @@ export default function AddEmployeeScreen() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{ email: string; password: string } | null>(null);
+  const [success, setSuccess] = useState<{ email: string; username: string; password: string } | null>(null);
   
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    username: '',
+    password: '',
+    confirmPassword: '',
     department: '',
     position: '',
     salary: '',
@@ -32,9 +35,9 @@ export default function AddEmployeeScreen() {
       setError(null);
       
       // Basic validation
-      if (!formData.name || !formData.email || !formData.department || 
-          !formData.position || !formData.salary || !formData.phoneNumber || 
-          !formData.joiningDate) {
+      if (!formData.name || !formData.email || !formData.username || !formData.password || 
+          !formData.department || !formData.position || !formData.salary || 
+          !formData.phoneNumber || !formData.joiningDate) {
         throw new Error('Please fill in all required fields');
       }
 
@@ -42,6 +45,15 @@ export default function AddEmployeeScreen() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
         throw new Error('Please enter a valid email address');
+      }
+
+      // Password validation
+      if (formData.password.length < 6) {
+        throw new Error('Password must be at least 6 characters long');
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error('Passwords do not match');
       }
 
       // Salary validation
@@ -57,7 +69,8 @@ export default function AddEmployeeScreen() {
 
       setSuccess({
         email: formData.email,
-        password: result.tempPassword,
+        username: formData.username,
+        password: formData.password,
       });
 
       // Clear form after 5 seconds and redirect
@@ -98,7 +111,8 @@ export default function AddEmployeeScreen() {
               Employee account created successfully!{'\n\n'}
               Login Credentials:{'\n'}
               Email: {success.email}{'\n'}
-              Temporary Password: {success.password}{'\n\n'}
+              Username: {success.username}{'\n'}
+              Password: {success.password}{'\n\n'}
               Redirecting to employees list...
             </Text>
           </View>
@@ -119,6 +133,33 @@ export default function AddEmployeeScreen() {
           placeholder="Enter work email address"
           keyboardType="email-address"
           autoCapitalize="none"
+          required
+        />
+
+        <TextField
+          label="Username"
+          value={formData.username}
+          onChangeText={(text) => setFormData(prev => ({ ...prev, username: text }))}
+          placeholder="Enter login username"
+          autoCapitalize="none"
+          required
+        />
+
+        <TextField
+          label="Password"
+          value={formData.password}
+          onChangeText={(text) => setFormData(prev => ({ ...prev, password: text }))}
+          placeholder="Create login password"
+          secureTextEntry
+          required
+        />
+
+        <TextField
+          label="Confirm Password"
+          value={formData.confirmPassword}
+          onChangeText={(text) => setFormData(prev => ({ ...prev, confirmPassword: text }))}
+          placeholder="Confirm login password"
+          secureTextEntry
           required
         />
 
