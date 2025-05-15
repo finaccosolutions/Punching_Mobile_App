@@ -1,10 +1,13 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
-import { Chrome as Home, Settings } from 'lucide-react-native';
+import { useAuth } from '@/context/AuthContext';
+import { Chrome as Home, Users, ClipboardList, ChartBar as BarChart3, DollarSign, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   
   return (
     <Tabs
@@ -27,6 +30,36 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="employees"
+        options={{
+          title: 'Employees',
+          tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
+        }}
+      />
+      {!isAdmin && (
+        <Tabs.Screen
+          name="attendance"
+          options={{
+            title: 'Attendance',
+            tabBarIcon: ({ color, size }) => <ClipboardList size={size} color={color} />,
+          }}
+        />
+      )}
+      <Tabs.Screen
+        name="payroll"
+        options={{
+          title: 'Payroll',
+          tabBarIcon: ({ color, size }) => <DollarSign size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="reports"
+        options={{
+          title: 'Reports',
+          tabBarIcon: ({ color, size }) => <BarChart3 size={size} color={color} />,
         }}
       />
       <Tabs.Screen
