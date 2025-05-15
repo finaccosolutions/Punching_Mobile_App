@@ -2,7 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
-import { Chrome as Home, Users, ClipboardList, ChartBar as BarChart3, DollarSign, Settings } from 'lucide-react-native';
+import { Chrome as Home, Users, ChartBar as BarChart3, DollarSign, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
   const { colors } = useTheme();
@@ -39,15 +39,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
         }}
       />
-      {!isAdmin && (
-        <Tabs.Screen
-          name="attendance"
-          options={{
-            title: 'Attendance',
-            tabBarIcon: ({ color, size }) => <ClipboardList size={size} color={color} />,
-          }}
-        />
-      )}
       <Tabs.Screen
         name="payroll"
         options={{

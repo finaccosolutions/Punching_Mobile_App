@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import * as crypto from 'crypto';
 
 const supabase = createClient(
   process.env.EXPO_PUBLIC_SUPABASE_URL!,
@@ -7,6 +8,8 @@ const supabase = createClient(
 
 interface CreateEmployeeData {
   email: string;
+  username: string;
+  password: string;
   name: string;
   department: string;
   position: string;
@@ -26,6 +29,11 @@ export interface Employee {
   phone_number?: string;
 }
 
+// Hash password using SHA-256
+const hashPassword = (password: string): string => {
+  return crypto.createHash('sha256').update(password).digest('hex');
+};
+
 // Get all employees
 export const getAllEmployees = async (): Promise<Employee[]> => {
   const { data, error } = await supabase
@@ -43,29 +51,10 @@ export const getAllEmployees = async (): Promise<Employee[]> => {
 // Create new employee (admin only)
 export const createEmployee = async (employeeData: CreateEmployeeData) => {
   try {
-    // Generate a temporary password
-    const tempPassword = Math.random().toString(36).slice(-8);
-
-    // Create auth user
-    const { data: { user }, error: authError } = await supabase.auth.admin.createUser({
-      email: employeeData.email,
-      password: tempPassword,
-      email_confirm: true
-    });
-
-    if (authError) {
-      throw new Error(authError.message);
-    }
-
-    if (!user) {
-      throw new Error('Failed to create user');
-    }
-
-    // Create user profile
-    const { error: profileError } = await supabase
+    // Start a transaction
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .insert({
-        id: user.id,
         full_name: employeeData.name,
         role: 'employee',
         department: employeeData.department,
@@ -74,17 +63,37 @@ export const createEmployee = async (employeeData: CreateEmployeeData) => {
         phone_number: employeeData.phoneNumber,
         joining_date: employeeData.joiningDate,
         address: employeeData.address,
-      });
+        email: employeeData.email
+      })
+      .select()
+      .single();
 
     if (profileError) {
-      // Rollback auth user creation if profile creation fails
-      await supabase.auth.admin.deleteUser(user.id);
       throw new Error('Failed to create employee profile');
     }
 
+    // Create employee credentials
+    const { error: credentialsError } = await supabase
+      .from('employee_credentials')
+      .insert({
+        employee_id: profile.id,
+        username: employeeData.username,
+        password_hash: hashPassword(employeeData.password)
+      });
+
+    if (credentialsError) {
+      // Rollback profile creation
+      await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', profile.id);
+      throw new Error('Failed to create employee credentials');
+    }
+
     return {
-      user,
-      tempPassword,
+      profile,
+      username: employeeData.username,
+      password: employeeData.password
     };
   } catch (error) {
     if (error instanceof Error) {
